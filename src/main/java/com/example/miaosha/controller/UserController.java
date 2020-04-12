@@ -1,5 +1,7 @@
 package com.example.miaosha.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.example.miaosha.controller.vo.UserVO;
 import com.example.miaosha.error.BusinessException;
 import com.example.miaosha.error.EmBusinessError;
@@ -9,10 +11,13 @@ import com.example.miaosha.service.model.UserModel;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Controller("user")
 @RequestMapping("/user")
@@ -42,4 +47,16 @@ public class UserController {
         BeanUtils.copyProperties(userModel, userVO);
         return userVO;
     }
+
+    // 定义exceptionHandler，解决未被controller层吸收的exception
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.OK)
+    public Object handlerException(HttpServletRequest request, Exception ex){
+        CommonReturnType crt = new CommonReturnType();
+        crt.setStatus("fail");
+        crt.setData(ex);
+        return crt;
+    }
+    
+
 }
