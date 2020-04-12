@@ -2,7 +2,8 @@ package com.example.miaosha.error;
 
 public enum EmBusinessError implements CommonError{
     // 通用错误类型：00001
-    PARAMETER_VALIDATION_ERROR(00001,"参数不合法"),
+    UNKNOWN_ERROR(80000,"未知错误"),
+    PARAMETER_VALIDATION_ERROR(80001,"参数不合法"),
     // 10000开头，为用户信息相关错误的定义
     USER_NOT_EXIST(10001,"用户不存在")
     ;
