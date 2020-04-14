@@ -52,6 +52,11 @@ public class UserController extends BaseController {
         return "register";
     }
 
+    @GetMapping("/login")
+    public String login(){
+        return "login";
+    }
+
     @RequestMapping("/get")
     @ResponseBody
     public CommonReturnType getUser(@RequestParam(name = "id") Integer id) throws BusinessException {
@@ -81,6 +86,26 @@ public class UserController extends BaseController {
         // 将OTP验证码通过短信通道，发送给用户，省略
         LOGGER.info("phone = " + phone + "& otpCode = " + otpCode);
         System.out.println("phone = " + phone + "& otpCode = " + otpCode);
+        return CommonReturnType.create(null);
+    }
+
+    // 用户注册接口
+    @RequestMapping(method = { RequestMethod.POST }, value = "/login", consumes = {
+        BaseController.CONTENT_TYPE_FORMED })
+    @ResponseBody
+    public CommonReturnType login(@RequestParam(name = "phone")String phone,
+    @RequestParam(name = "password")String password) throws BusinessException, NoSuchAlgorithmException,
+            UnsupportedEncodingException {
+        // 入参校验
+        if(org.apache.commons.lang3.StringUtils.isEmpty(phone) || 
+        org.apache.commons.lang3.StringUtils.isEmpty(password)){
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
+        }
+        String encryptPassword = this.EncodeByMD5(password);
+        UserModel userModel = userService.validateLogin(phone, encryptPassword);
+        // 将登陆成功的凭证，加入到用户登陆成功的session内。
+        this.httpServletRequest.getSession().setAttribute("IS_LOGIN", true);
+        this.httpServletRequest.getSession().setAttribute("LOGIN_USER", userModel);
         return CommonReturnType.create(null);
     }
 

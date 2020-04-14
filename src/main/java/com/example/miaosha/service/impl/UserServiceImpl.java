@@ -94,4 +94,20 @@ public class UserServiceImpl implements UserService {
         BeanUtils.copyProperties(userModel, userDO);
         return userDO;
     }
+
+    @Override
+    public UserModel validateLogin(String phone, String encryptPassword) throws BusinessException {
+        // 通过用户的手机，拿到用户信息。
+        UserDO userDO = userDOMapper.selectByPhone(phone);
+        if(userDO == null){
+            throw new BusinessException(EmBusinessError.USER_LOGIN_FAIL);
+        }
+        UserPasswordDO userPasswordDO = userPasswordDOMapper.selectByUserId(userDO.getId());
+        UserModel userModel = convertFromDataObject(userDO, userPasswordDO);
+        // 比对用户信息内加密的密码，是否和传入的密码相匹配。
+        if(!StringUtils.equals(encryptPassword, userModel.getEncryptPassword())){
+            throw new BusinessException(EmBusinessError.USER_LOGIN_FAIL);
+        }
+        return userModel;
+    }
 }
